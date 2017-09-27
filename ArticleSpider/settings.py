@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import os
 # Scrapy settings for ArticleSpider project
 #
 # For simplicity, this file contains only settings considered important or
@@ -70,7 +70,6 @@ ITEM_PIPELINES = {
     'ArticleSpider.pipelines.ArticleImagePipeline': 1,
 }
 IMAGES_URLS_FIELD = "front_image_url"
-import os
 project_dir = os.path.abspath(os.path.dirname(__file__))
 IMAGES_STORE = os.path.join(project_dir, "images")
 

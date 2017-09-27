@@ -19,14 +19,15 @@ class JobboleSpider(scrapy.Spider):
         """
 
         # 第一步
-        post_nodes = response.css("#archive .floated-thumb .post-thumb a")
+        post_nodes = response.xpath("//*[@id='archive']//div[@class='post-thumb']/a")
         for post_node in post_nodes:
-            image_url = post_node.css("img::attr(src)").extract_first("")
-            post_url = post_node.css("::attr(href)").extract_first("")
-            yield Request(url=parse.urljoin(response.url, post_url), meta={"front_image_url": image_url}, callback=self.parse_detail)
+            image_url = post_node.xpath("./img/@src").extract_first("")
+            post_url = post_node.xpath("./@href").extract_first("")
+            yield Request(url=parse.urljoin(response.url, post_url), meta={"front_image_url": image_url},
+                          callback=self.parse_detail)
 
         # 提取下一页的url
-        next_urls = response.css(".next.page-numbers::attr(href)").extract_first("")
+        next_urls = response.xpath("//a[contains(@class, 'next')]/@href").extract_first("")
         if next_urls:
             yield Request(url=parse.urljoin(response.url, next_urls), callback=self.parse)
 
@@ -60,7 +61,7 @@ class JobboleSpider(scrapy.Spider):
         article_item.update({
             "title": title,
             "url": response.url,
-            "url_object_id": get_md5(response.rul),
+            "url_object_id": get_md5(response.url),
             "create_date": create_date,
             "front_image_url": [front_image_url],
             "praise_nums": praise_nums,
