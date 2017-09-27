@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 import re
+import datetime
 from scrapy.http import Request
 from urllib import parse
 from ArticleSpider.items import JobBoleArticleItem
@@ -39,6 +40,10 @@ class JobboleSpider(scrapy.Spider):
         title = response.xpath('//div[@class="entry-header"]//h1/text()').extract_first()
         create_date = response.xpath(
             '//p[@class="entry-meta-hide-on-mobile"]/text()').extract_first().strip().replace("·", "").strip()
+        try:
+            create_date = datetime.datetime.strptime(create_date, "%Y/%m%d").date()
+        except Exception as e:
+            create_date = datetime.datetime.now().date()
         praise_nums = int(response.xpath('//span[contains(@class, "vote-post-up")]/h10/text()').extract_first())
         fav_nums = response.xpath('//span[contains(@class, "bookmark-btn")]/text()').extract_first()
         match_re = re.match(".*(\d+).*", fav_nums)
