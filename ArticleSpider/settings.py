@@ -67,7 +67,8 @@ ROBOTSTXT_OBEY = False
 ITEM_PIPELINES = {
     # 'ArticleSpider.pipelines.ArticlespiderPipeline': 300,  # 数字越小,优先级越高
     # 'scrapy.pipelines.images.ImagesPipeline': 1,
-    'ArticleSpider.pipelines.MysqlTwistedPipeline': 1,
+    'ArticleSpider.pipelines.ArticleImagePipeline': 1,
+    'ArticleSpider.pipelines.MysqlTwistedPipeline': 2,
     # 'ArticleSpider.pipelines.JsonExporterPipeline': 2,
 }
 IMAGES_URLS_FIELD = "front_image_url"  # 列表

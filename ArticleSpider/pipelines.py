@@ -93,15 +93,19 @@ class MysqlTwistedPipeline(object):
     def do_insert(self, cursor, item):
         # 执行具体的插入逻辑
         insert_sql = """
-                    insert into jobbole_article(title, url, create_date, fav_nums)
-                    VALUES (%s, %s, %s, %s)
+                insert into jobbole_article(title, create_date, url, url_object_id, front_image_url, front_image_path,
+                                            comment_nums, fav_nums, praise_nums, tags, content)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
-        cursor.execute(insert_sql, (item["title"], item["url"], item["create_date"], item["fav_nums"]))
+        cursor.execute(insert_sql, (item["title"], item["create_date"], item["url"], item["url_object_id"],
+                                    item["front_image_url"], item["front_image_path"], item["comment_nums"],
+                                    item["fav_nums"], item["praise_nums"], item["tags"], item["content"]))
 
 
 class ArticleImagePipeline(ImagesPipeline):
     def item_completed(self, results, item, info):
-        for ok, value in results:
-            image_file_path = value["path"]
-        item["front_image_path"] = image_file_path
+        if "front_image_url" in item:
+            for ok, value in results:
+                image_file_path = value["path"]
+            item["front_image_path"] = image_file_path
         return item
