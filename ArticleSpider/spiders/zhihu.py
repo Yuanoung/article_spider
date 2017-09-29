@@ -2,6 +2,7 @@
 import scrapy
 import json
 import re
+from PIL import Image
 
 
 class ZhihuSpider(scrapy.Spider):
@@ -26,13 +27,35 @@ class ZhihuSpider(scrapy.Spider):
         if not match_obj:
             return
         xsrf = match_obj.group(1)  # 这里视频中有括号
-        return [scrapy.FromRequest(
+        post_data = {
+            "_xsrf": xsrf,
+            "phone_num": "your phone numbers",
+            "password": "password",
+            "captcha": "",
+        }
+        import time
+        t = str(int(time.time() * 1000))
+        captcha_url = "https://www.zhihu.com/captcha.gif?r={0}&type=login".format(t)
+        yield scrapy.Request(captcha_url, headers=self.headers,
+                             meta={"post_data": post_data}, callback=self.login_after_captcha)  # 回调函数cookie是相同的
+
+    def login_after_captcha(self, response):
+        with open("captcha.jpg", "wb") as f:
+            f.write(response.body)  # 不是在content中,
+
+        try:
+            im = Image.open("captcha.jpg")
+            im.show()
+            im.close()
+        except:
+            pass
+        captcha = input("输入验证码:\n>>> ")
+
+        post_data = response.meta.get("post_data", {})
+        post_data["captcha"] = captcha
+        return [scrapy.FormRequest(
             url="https://www.zhihu.com/login/phone_num",
-            formdata={
-                "_xsrf": xsrf,
-                "phone_num": "18667188669",
-                "password": "brb5cbvw9",
-            },
+            formdata=post_data,
             headers=self.headers,
             callback=self.check_login,
         )]
@@ -43,4 +66,3 @@ class ZhihuSpider(scrapy.Spider):
         if text_json.get("msg") == "登录成功":
             for url in self.start_urls:
                 yield scrapy.Request(url, dont_filter=True, headers=self.headers)
-        pass

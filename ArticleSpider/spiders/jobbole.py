@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 import scrapy
-import re
-import datetime
 from scrapy.http import Request
 from urllib import parse
 from ArticleSpider.items import JobBoleArticleItem, ArticleItemLoader
 from ArticleSpider.utils.common import get_md5
-from scrapy.loader import ItemLoader
 
 
 class JobboleSpider(scrapy.Spider):
@@ -76,7 +73,6 @@ class JobboleSpider(scrapy.Spider):
         #     "tags": tags,
         #     "content": content,
         # })
-
 
         # 通过item loader 加载item
         item_loader = ArticleItemLoader(item=JobBoleArticleItem(), response=response)
